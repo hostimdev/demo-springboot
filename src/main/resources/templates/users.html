@@ -1,0 +1,96 @@
+<!-- src/main/resources/templates/users.html -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <title th:text="${title}">User Management</title>
+    <meta charset="UTF-8" />
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+      }
+      .file-upload-container {
+        margin: 10px 0;
+      }
+      .file-input-controls {
+        display: flex;
+        align-items: center;
+      }
+      button {
+        margin: 5px;
+        padding: 5px 10px;
+      }
+      ul {
+        list-style: none;
+        padding: 0;
+      }
+      li {
+        padding: 10px;
+        border-bottom: 1px solid #eee;
+        display: flex;
+        align-items: center;
+      }
+      li img {
+        margin-right: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1 th:text="${title}">User Management</h1>
+
+    <form action="/users" method="POST" enctype="multipart/form-data">
+      <div>
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" required />
+      </div>
+      <div>
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required />
+      </div>
+      <div class="file-upload-container">
+        <label for="avatar">Avatar:</label>
+        <div class="file-input-controls">
+          <input type="file" id="avatar" name="avatar" />
+          <button type="button" id="clearFileButton">Clear</button>
+        </div>
+      </div>
+      <button type="submit">Add User</button>
+    </form>
+
+    <h2>User List</h2>
+    <p th:if="${users != null && !users.empty}">
+      Data source: <span th:text="${dataSource}"></span>
+    </p>
+    <ul th:if="${users != null && !users.empty}">
+      <li th:each="user : ${users}">
+        <img
+          th:if="${user.avatarPath != null}"
+          th:src="${user.avatarPath}"
+          th:alt="${user.name}"
+          width="50"
+          height="50"
+        />
+        <span th:unless="${user.avatarPath != null}">No avatar</span>
+        <span
+          th:text="${user.name} + ' (' + ${user.email} + ') - ' + ${user.status}"
+        ></span>
+      </li>
+    </ul>
+    <p th:unless="${users != null && !users.empty}">No users found</p>
+
+    <script>
+      document
+        .getElementById("clearFileButton")
+        .addEventListener("click", function () {
+          var fileInput = document.getElementById("avatar");
+          // Create a new file input element
+          var newFileInput = document.createElement("input");
+          newFileInput.type = "file";
+          newFileInput.id = "avatar";
+          newFileInput.name = "avatar";
+          // Replace the old file input with the new one
+          fileInput.parentNode.replaceChild(newFileInput, fileInput);
+        });
+    </script>
+  </body>
+</html>
