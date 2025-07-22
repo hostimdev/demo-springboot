@@ -11,6 +11,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import com.example.demo.aspect.CacheSourceAspect;
 
 import java.util.List;
 
@@ -28,18 +29,12 @@ public class UserController {
 
     @GetMapping("/users")
     public String listUsers(Model model) {
-        // Log before fetching
-        System.out.println("About to fetch users...");
-
         // Fetch users - this will use cache if available
         List<User> users = userService.getAllUsers();
 
-        // Check if data came from cache by examining the logs
-        // or checking Redis directly via cacheManager
-        boolean dataInCache = cacheManager.getCache("users") != null &&
-                              cacheManager.getCache("users").get("allUsers") != null;
-
-        String dataSource = dataInCache ? "Redis Cache" : "PostgreSQL Database";
+        // Check if data came from database
+        boolean dataFromDatabase = userService.wasLoadedFromDatabase();
+        String dataSource = dataFromDatabase ? "PostgreSQL Database" : "Redis Cache";
 
         model.addAttribute("users", users);
         model.addAttribute("title", "User Management");
